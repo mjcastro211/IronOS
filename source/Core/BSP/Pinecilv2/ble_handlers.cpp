@@ -35,6 +35,7 @@
 
 extern TickType_t    lastMovementTime;
 extern OperatingMode currentOperatingMode;
+extern volatile int16_t g_ble_accel[3];
 
 int ble_char_read_status_callback(struct bt_conn *conn, const struct bt_gatt_attr *attr, void *buf, u16_t len, u16_t offset) {
   if (attr == NULL || attr->uuid == NULL) {
@@ -204,6 +205,13 @@ int ble_char_read_bulk_value_callback(struct bt_conn *conn, const struct bt_gatt
       uint32_t id = getDeviceValidation();
       memcpy(buf, &id, sizeof(id));
       return sizeof(id);
+    }
+    case 6:
+    // Accelerometer X, Y, Z (int16, little-endian)
+    {
+      int16_t xyz[3] = {g_ble_accel[0], g_ble_accel[1], g_ble_accel[2]};
+      memcpy(buf, xyz, sizeof(xyz));
+      return sizeof(xyz);
     }
   default:
     break;

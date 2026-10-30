@@ -90,7 +90,15 @@ void detectAccelerometerVersion() {
     DetectedAccelerometerVersion = AccelType::None;
   }
 }
+volatile int16_t g_ble_accel[3] = {0, 0, 0};
+inline void readAccelerometerRaw(int16_t &tx, int16_t &ty, int16_t &tz, Orientation &rotation);
 inline void readAccelerometer(int16_t &tx, int16_t &ty, int16_t &tz, Orientation &rotation) {
+  readAccelerometerRaw(tx, ty, tz, rotation);
+  g_ble_accel[0] = tx;
+  g_ble_accel[1] = ty;
+  g_ble_accel[2] = tz;
+}
+inline void readAccelerometerRaw(int16_t &tx, int16_t &ty, int16_t &tz, Orientation &rotation) {
 #ifdef ACCEL_MMA
   if (DetectedAccelerometerVersion == AccelType::MMA) {
     MMA8652FC::getAxisReadings(tx, ty, tz);
